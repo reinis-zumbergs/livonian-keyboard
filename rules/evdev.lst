@@ -577,6 +577,8 @@
   sgs             lt: Samogitian
   apostrophe      lv: Latvian (apostrophe)
   tilde           lv: Latvian (tilde)
+  livonianapxtd   lv: Livonian (apostrophe+tilde)
+  livlinguapxtd   lv: Livonian Linguistic ApXTd
   fkey            lv: Latvian (F)
   modern          lv: Latvian (modern)
   ergonomic       lv: Latvian (ergonomic, ŪGJRMV)

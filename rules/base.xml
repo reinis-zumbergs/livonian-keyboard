@@ -4261,6 +4261,18 @@
         </variant>
         <variant>
           <configItem>
+            <name>livonianapxtd</name>
+            <description>Livonian (apostrophe+tilde)</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
+            <name>livlinguapxtd</name>
+            <description>Livonian Linguistic ApXTd</description>
+          </configItem>
+        </variant>
+        <variant>
+          <configItem>
             <name>fkey</name>
             <description>Latvian (F)</description>
           </configItem>
