@@ -1,0 +1,14 @@
+/compat/
+/geometry/
+/keycodes/
+
+/rules/*
+!/rules/base.lst
+!/rules/base.xml
+!/rules/evdev.lst
+!/rules/evdev.xml
+
+/symbols/*
+!/symbols/lv
+
+/types/
