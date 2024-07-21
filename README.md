@@ -1,26 +1,57 @@
-### No modifier
+# Livonian Keyboard Layout
+This Livonian keyboard layout is an expansion of the widely used Latvian (apostrophe) keyboard layout. With this layout apostrophe and backtick become dead keys for entering diacritics. The layout is designed to be used with the standard US keyboard layout.
+
+
+## Layout
+
+### Key output without dead key
     qwertyuiop
     asdfghjkl
     zxcvbnm
 
-    QWERTYUIOP
-    ASDFGHJKL
-    ZXCVBNM
+### Key output after apostrophe
+*Dash means that the key is not modified*
 
-### Apostrophe
     äüēŗţȳūīōǫ
-    āšḑfģhȯķļ
-    žöčvbņõ
+    āšḑ-ģ-ȯķļ
+    žöč--ņõ
 
-    ÄÜĒŖŢȲŪĪŌǪ
-    ĀŠḐFĢHȮĶĻ
-    ŽÖČVBŅÕ
+### Key output after backtick
+*Dash means that the key is not modified*
 
-### Tilde (backtick)
     ǟǖ-------ǭ
     ------ȱ--
     -ȫ----ȭ
 
-    ǞǕ-------Ǭ
-    ------Ȱ--
-    -Ȫ----Ȭ
+### Table
+*Dash means that the output is not modified*
+
+| Key | Normal output | After apostrophe | After backtick |
+| --- | --- | --- | --- |
+| q | q | ä | ǟ |
+| w | w | ü | ǖ |
+| e | e | ē | - |
+| r | r | ŗ | - |
+| t | t | ţ | - |
+| y | y | ȳ | - |
+| u | u | ū | - |
+| i | i | ī | - |
+| o | o | ō | - |
+| p | p | ǫ | - |
+| a | a | ā | - |
+| s | s | š | - |
+| d | d | ḑ | - |
+| f | f | - | - |
+| g | g | ģ | - |
+| h | h | - | - |
+| j | j | ȯ | ȱ |
+| k | k | ķ | - |
+| l | l | ļ | - |
+| z | z | ž | - |
+| x | x | ö | ȫ |
+| c | c | č | - |
+| v | v | - | - |
+| b | b | - | - |
+| n | n | ņ | - |
+| m | m | õ | ȭ |
+
