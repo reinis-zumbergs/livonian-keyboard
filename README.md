@@ -26,8 +26,10 @@ This Livonian keyboard layout is an expansion of the widely used Latvian (apostr
 ### Table
 *Dash means that the output is not modified*
 
-| Key | Normal output | After apostrophe | After backtick |
+| Key | Output | After apostrophe | After backtick |
 | --- | --- | --- | --- |
+| ` |   | ` | ` |
+| ' |   | ' | ' |
 | q | q | ä | ǟ |
 | w | w | ü | ǖ |
 | e | e | ē | - |
@@ -37,7 +39,7 @@ This Livonian keyboard layout is an expansion of the widely used Latvian (apostr
 | u | u | ū | - |
 | i | i | ī | - |
 | o | o | ō | - |
-| p | p | ǫ | - |
+| p | p | ǫ | ǭ |
 | a | a | ā | - |
 | s | s | š | - |
 | d | d | ḑ | - |
