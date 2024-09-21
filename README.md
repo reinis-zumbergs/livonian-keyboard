@@ -59,7 +59,12 @@ This Livonian keyboard layout is an expansion of the widely used Latvian (apostr
 
 
 ## Bookmarklet
-You can use the following bookmarklet to easily activate the Livonian keyboard layout on any website. Just right-click on the link below and select "Add to bookmarks" or drag the link to your bookmarks bar.
+Bookmarklet is an easy, no-installation method of temporarily enabling the Livonian keyboard layout on (almost) any website. For instructions, see the [bookmarklet page](bookmarklet/BOOKMARKLET.md).
 
-[Activate Livonian Keyboard Layout](javascript:(function(){var s=document.createElement('script');s.src='https://reinis-zumbergs.github.io/livonian-keyboard/bookmarklet/livonian-keyboard.js';document.body.appendChild(s);})();)
 
+## TODO
+- Bookmarklet: Show visual indicator when the layout is active
+
+
+## License
+This project is licensed under the MIT License.
