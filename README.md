@@ -59,7 +59,7 @@ This Livonian keyboard layout is an expansion of the widely used Latvian (apostr
 
 
 ## Bookmarklet
-Bookmarklet is an easy, no-installation method of temporarily enabling the Livonian keyboard layout on (almost) any website. For instructions, see the [bookmarklet page](bookmarklet/BOOKMARKLET.md).
+Bookmarklet is an easy, no-installation method of temporarily enabling the Livonian keyboard layout on (almost) any website. For instructions, see the [bookmarklet page](https://reinis-zumbergs.github.io/livonian-keyboard/bookmarklet/BOOKMARKLET.html).
 
 
 ## TODO
