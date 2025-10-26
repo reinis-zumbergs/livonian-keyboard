@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Test Contenteditable with Placeholder</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				max-width: 600px;
+				margin: 50px auto;
+				padding: 20px;
+			}
+			.editor-container {
+				border: 1px solid #ccc;
+				border-radius: 8px;
+				padding: 12px;
+				background: white;
+			}
+			.editor-container:focus-within {
+				border-color: #1877f2;
+				outline: 2px solid #e7f3ff;
+			}
+			input {
+				width: 100%;
+				border: none;
+				font-size: 16px;
+				font-family: inherit;
+			}
+			textarea {
+				width: 100%;
+				border: none;
+				font-size: 16px;
+				font-family: inherit;
+				resize: vertical;
+				min-height: 100px;
+			}
+			.input-element {
+				position: relative;
+				margin-bottom: 10px;
+			}
+			.placeholder {
+				position: absolute;
+				top: 12px;
+				left: 12px;
+				color: #65676b;
+				pointer-events: none;
+			}
+			[contenteditable="true"] {
+				outline: none;
+				min-height: 100px;
+			}
+			[contenteditable="true"]:not(:empty) + .placeholder {
+				display: none;
+			}
+			h1 {
+				color: #1c1e21;
+			}
+			.info {
+				background: #e7f3ff;
+				padding: 15px;
+				border-radius: 8px;
+				margin-bottom: 20px;
+			}
+		</style>
+		<script>
+			// on blur of the input[type="url"], write a link to the DOM of the page
+			document.addEventListener("DOMContentLoaded", function () {
+				const urlInputs = document.querySelectorAll('input[type="url"]');
+				urlInputs.forEach((input) => {
+					input.addEventListener("blur", function () {
+						const link = input.parentElement.querySelector("a");
+						link.href = this.value;
+						link.innerText = this.value;
+						input.parentElement.appendChild(link);
+					});
+				});
+			});
+
+			function duplicateInputElement(button) {
+				const existingInput =
+					button.parentElement.querySelector(".input-element");
+				const newInput = existingInput.cloneNode(true);
+				existingInput.parentNode.insertBefore(newInput, button);
+			}
+		</script>
+	</head>
+	<body>
+		<h1>Field Test</h1>
+
+		<div class="info">
+			<strong>Instructions:</strong>
+			<ul>
+				<li>
+					Go to the
+					<a
+						href="https://reinis-zumbergs.github.io/livonian-keyboard/bookmarklet/BOOKMARKLET.html"
+						>bookmarklet page</a
+					>.
+				</li>
+				<li>Add the bookmarklet to your browser.</li>
+				<li>Return to this same page <a href="">Test inputs</a>.</li>
+				<li>Press the newly added bookmarklet in your browser.</li>
+				<li>
+					Observe the Sierra Leone flag (🇸🇱) indicator added to the inputs.
+				</li>
+			</ul>
+		</div>
+
+		<h2 style="margin-top: 40px">Input "text" Example</h2>
+		<div class="editor-container">
+			<input
+				type="text"
+				class="input-element"
+				placeholder="What's on your mind?"
+			/>
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">Input "text" without placeholder</h2>
+		<div class="editor-container">
+			<input type="text" class="input-element" placeholder="" />
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">Input "search" Example</h2>
+		<div class="editor-container">
+			<input
+				type="search"
+				class="input-element"
+				placeholder="What are you looking for?"
+			/>
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">Input "search" without placeholder</h2>
+		<div class="editor-container">
+			<input type="search" class="input-element" placeholder="" />
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">Input "url" Example</h2>
+		<div class="editor-container">
+			<input type="url" class="input-element" placeholder="What is the URL?" />
+			<a href="#" target="_blank"></a>
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">Input "url" without placeholder</h2>
+		<div class="editor-container">
+			<input type="url" class="input-element" placeholder="" />
+			<a href="#" target="_blank"></a>
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">Textarea Example</h2>
+		<div class="editor-container">
+			<textarea
+				class="input-element"
+				placeholder="What's on your mind?"
+			></textarea>
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">Textarea without placeholder</h2>
+		<div class="editor-container">
+			<textarea class="input-element"></textarea>
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">Contenteditable Example</h2>
+		<div class="editor-container">
+			<div class="input-element">
+				<div contenteditable="true"></div>
+				<div aria-hidden="true" class="placeholder">What's on your mind?</div>
+			</div>
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">Contenteditable Another Example</h2>
+		<div class="editor-container">
+			<div class="input-element">
+				<div contenteditable="true"></div>
+				<div aria-hidden="true" class="placeholder">Write a comment...</div>
+			</div>
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+
+		<h2 style="margin-top: 40px">
+			Contenteditable Another Example with empty placeholder
+		</h2>
+		<div class="editor-container">
+			<div class="input-element">
+				<div contenteditable="true"></div>
+				<div aria-hidden="true" class="placeholder"></div>
+			</div>
+			<input
+				type="button"
+				value="Add another input"
+				onclick="duplicateInputElement(this)"
+			/>
+		</div>
+	</body>
+</html>
