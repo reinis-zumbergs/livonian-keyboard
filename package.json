@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"bookmarklet-minify": "terser bookmarklet/livonian-keyboard.js -o bookmarklet/livonian-keyboard.min.js",
+		"bookmarklet-minify": "terser bookmarklet/livonian-keyboard.js -c -m > bookmarklet/livonian-keyboard.min.js",
 		"prettier": "prettier --write ."
 	},
 	"keywords": [],
