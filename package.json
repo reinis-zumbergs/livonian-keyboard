@@ -4,7 +4,8 @@
   "description": "This Livonian keyboard layout is an expansion of the widely used Latvian (apostrophe) keyboard layout. With this layout apostrophe and backtick become dead keys for entering diacritics. The layout is designed to be used with the standard US keyboard layout.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "bookmarklet-minify": "terser bookmarklet/livonian-keyboard.js -o bookmarklet/livonian-keyboard.min.js"
   },
   "keywords": [],
   "author": "",
