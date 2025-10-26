@@ -19,6 +19,11 @@
 		"terser": "^5.31.3"
 	},
 	"lint-staged": {
+		"bookmarklet/livonian-keyboard.js": [
+			"prettier --write",
+			"bash -c 'npm run bookmarklet-minify'",
+			"git add bookmarklet/livonian-keyboard.min.js"
+		],
 		"**/*": "prettier --write --ignore-unknown"
 	}
 }
