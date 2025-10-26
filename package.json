@@ -1,16 +1,18 @@
 {
-  "name": "keyboard",
-  "version": "1.0.0",
-  "description": "This Livonian keyboard layout is an expansion of the widely used Latvian (apostrophe) keyboard layout. With this layout apostrophe and backtick become dead keys for entering diacritics. The layout is designed to be used with the standard US keyboard layout.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "bookmarklet-minify": "terser bookmarklet/livonian-keyboard.js -o bookmarklet/livonian-keyboard.min.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "terser": "^5.31.3"
-  }
+	"name": "keyboard",
+	"version": "1.0.0",
+	"description": "This Livonian keyboard layout is an expansion of the widely used Latvian (apostrophe) keyboard layout. With this layout apostrophe and backtick become dead keys for entering diacritics. The layout is designed to be used with the standard US keyboard layout.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"bookmarklet-minify": "terser bookmarklet/livonian-keyboard.js -o bookmarklet/livonian-keyboard.min.js",
+		"prettier": "prettier --write ."
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"prettier": "3.6.2",
+		"terser": "^5.31.3"
+	}
 }
