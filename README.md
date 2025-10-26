@@ -67,7 +67,10 @@ Bookmarklet is an easy, no-installation method of temporarily enabling the Livon
 
 ## TODO
 
-- Bookmarklet: Show visual indicator when the layout is active
+- Chrome extension
+- Firefox extension
+- Microsoft Edge extension
+- Safari extension
 
 ## License
 
