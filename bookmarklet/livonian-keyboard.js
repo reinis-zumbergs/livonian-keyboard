@@ -6,7 +6,6 @@
 		console.info("Livonian keyboard is already active");
 		return;
 	}
-	window.livonianKeyboardActive = true;
 
 	const deadKeyMap = {
 		"'": {
@@ -77,20 +76,20 @@
 		// console.log('pressing', event.key);
 		// Ignore keydown events that are not printable characters
 		if (event.key.length !== 1) {
-			// console.log('Ignore non-printable key ' + event.key);
+			// console.log('Ignore non-printable key', event.key);
 			return;
 		}
 
 		if (activeDeadKey) {
-			// console.log('Active dead key ' + activeDeadKey);
+			// console.log('Active dead key', activeDeadKey);
 			if (deadKeyMap[activeDeadKey][event.key] !== undefined) {
 				const modifiedChar = deadKeyMap[activeDeadKey][event.key];
-				// console.log('Output mapped character ' + modifiedChar)
+				// console.log('Output mapped character', modifiedChar)
 				insertCharacter(modifiedChar);
-				// console.log('Prevent default ' + event.key);
+				// console.log('Prevent default', event.key);
 				event.preventDefault();
 			} else {
-				// console.log('Allow default ' + event.key);
+				// console.log('No mapping. Passing through', event.key);
 			}
 
 			// console.log('Clear active dead key');
@@ -100,13 +99,13 @@
 		}
 
 		if (deadKeyMap[event.key] !== undefined) {
-			// console.log('Set active dead key ' + event.key);
+			// console.log('Set active dead key', event.key);
 			activeDeadKey = event.key;
 			event.preventDefault();
+		} else {
+			// console.log('Not a dead key. Passing through', event.key);
 		}
 	});
-
-	console.info("Livonian keyboard activated");
 
 	function insertCharacter(char) {
 		const activeElement = document.activeElement;
@@ -122,4 +121,8 @@
 			document.execCommand("insertText", false, char);
 		}
 	}
+
+	window.livonianKeyboardActive = true;
+
+	console.info("Livonian keyboard activated");
 })();
