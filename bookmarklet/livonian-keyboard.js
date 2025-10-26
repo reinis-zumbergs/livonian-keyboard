@@ -122,6 +122,20 @@
 		}
 	}
 
+	// Add Sierra Leone flag emoji to various input element backgrounds
+	const CSS = `
+		input[type="text"], input:not([type]),
+		input[type="search"], input[type="url"],
+		textarea, [contenteditable="true"] {
+			background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="20"><text x="0" y="16">🇸🇱</text></svg>');
+			background-repeat: no-repeat;
+			background-position: right top;
+		}
+	`;
+	const style = document.createElement("style");
+	style.appendChild(document.createTextNode(CSS));
+	document.head.appendChild(style);
+
 	window.livonianKeyboardActive = true;
 
 	console.info("Livonian keyboard activated");
