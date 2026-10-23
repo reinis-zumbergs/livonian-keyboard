@@ -72,7 +72,7 @@
 
 	let activeDeadKey = null;
 
-	document.addEventListener("keydown", function (event) {
+	function handleDeadKey(event) {
 		// console.log('pressing', event.key);
 		// Ignore keydown events that are not printable characters
 		if (event.key.length !== 1) {
@@ -85,7 +85,7 @@
 			if (deadKeyMap[activeDeadKey][event.key] !== undefined) {
 				const modifiedChar = deadKeyMap[activeDeadKey][event.key];
 				// console.log('Output mapped character', modifiedChar)
-				insertCharacter(modifiedChar);
+				insertCharacter(event.target.ownerDocument || document, modifiedChar);
 				// console.log('Prevent default', event.key);
 				event.preventDefault();
 			} else {
@@ -105,10 +105,10 @@
 		} else {
 			// console.log('Not a dead key. Passing through', event.key);
 		}
-	});
+	}
 
-	function insertCharacter(char) {
-		const activeElement = document.activeElement;
+	function insertCharacter(doc, char) {
+		const activeElement = doc.activeElement;
 		if (activeElement && activeElement.value !== undefined) {
 			const start = activeElement.selectionStart;
 			const end = activeElement.selectionEnd;
@@ -118,7 +118,7 @@
 				activeElement.value.substring(end);
 			activeElement.setSelectionRange(start + 1, start + 1);
 		} else {
-			document.execCommand("insertText", false, char);
+			doc.execCommand("insertText", false, char);
 		}
 	}
 
@@ -132,9 +132,44 @@
 			background-position: right top;
 		}
 	`;
-	const style = document.createElement("style");
-	style.appendChild(document.createTextNode(CSS));
-	document.head.appendChild(style);
+
+	function attachToDocument(doc) {
+		// Mark the document with an attribute instead of a JS property, so the
+		// mark is also visible to other script instances (e.g. the Chrome
+		// extension's content scripts, which run separately in every frame).
+		if (!doc.documentElement || doc.documentElement.dataset.livonianKeyboard) {
+			return;
+		}
+		doc.documentElement.dataset.livonianKeyboard = "active";
+
+		// Bind to the capturing phase, so the event is seen even when the page
+		// (e.g. Gmail) calls event.stopPropagation().
+		doc.addEventListener("keydown", handleDeadKey, true);
+
+		const style = doc.createElement("style");
+		style.appendChild(doc.createTextNode(CSS));
+		(doc.head || doc.documentElement).appendChild(style);
+	}
+
+	function attachToDocumentAndIframes(doc) {
+		attachToDocument(doc);
+		for (const iframe of doc.querySelectorAll("iframe")) {
+			let iframeDocument;
+			try {
+				iframeDocument = iframe.contentDocument;
+			} catch (e) {
+				continue; // Cross-origin iframe
+			}
+			if (iframeDocument) {
+				attachToDocumentAndIframes(iframeDocument);
+			}
+		}
+	}
+
+	// Periodically check for new iframes and for iframes that have loaded a
+	// new document
+	attachToDocumentAndIframes(document);
+	setInterval(attachToDocumentAndIframes, 500, document);
 
 	window.livonianKeyboardActive = true;
 
