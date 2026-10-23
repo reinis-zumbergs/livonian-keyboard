@@ -65,9 +65,23 @@ _Dash means that the output is not modified_
 
 Bookmarklet is an easy, no-installation method of temporarily enabling the Livonian keyboard layout on (almost) any website. For instructions, see the [bookmarklet page](https://reinis-zumbergs.github.io/livonian-keyboard/bookmarklet/BOOKMARKLET.html).
 
+## Chrome extension
+
+The Chrome extension enables the Livonian keyboard layout on all websites. It is not yet published in the Chrome Web Store. To install it from source:
+
+1. Run `npm install` and `npm run chrome-extension-prepare`.
+2. Open `chrome://extensions`, enable "Developer mode" and click "Load unpacked".
+3. Select the `chrome-extension` directory.
+
+To package the extension into `livonian-keyboard-chrome-extension.zip` for the Chrome Web Store, run `npm run chrome-extension-all`.
+
+## Development
+
+The keyboard logic lives in `bookmarklet/livonian-keyboard.js`. The minified version is generated on commit. Run the tests with `npm test`, and test manually with `bookmarklet/test-inputs.html`.
+
 ## TODO
 
-- Chrome extension
+- Publish Chrome extension in the Chrome Web Store
 - Firefox extension
 - Microsoft Edge extension
 - Safari extension
