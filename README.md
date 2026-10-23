@@ -77,7 +77,7 @@ To package the extension into `livonian-keyboard-chrome-extension.zip` for the C
 
 ## Development
 
-The keyboard logic lives in `bookmarklet/livonian-keyboard.js`. The minified version is generated on commit. Run the tests with `npm test`, and test manually with `bookmarklet/test-inputs.html`.
+The keyboard logic lives in `bookmarklet/livonian-keyboard.js`. The minified version and the link on the bookmarklet page are generated on commit. Run the tests with `npm test`, and test manually with `bookmarklet/test-inputs.html`.
 
 ## TODO
 

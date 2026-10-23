@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx prettier --check .
+      - run: npm test
+      # Fails when the minified script or the bookmarklet link wasn't
+      # regenerated, e.g. after a commit with --no-verify
+      - name: Check generated bookmarklet files are up to date
+        run: |
+          npm run bookmarklet-minify
+          npm run bookmarklet-link
+          git diff --exit-code bookmarklet/

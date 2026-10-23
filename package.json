@@ -6,6 +6,7 @@
 	"scripts": {
 		"test": "jest",
 		"bookmarklet-minify": "terser bookmarklet/livonian-keyboard.js -c -m > bookmarklet/livonian-keyboard.min.js",
+		"bookmarklet-link": "node scripts/bookmarklet-link.js",
 		"prettier": "prettier --write .",
 		"prepare": "husky",
 		"chrome-extension-prepare": "cp bookmarklet/livonian-keyboard.min.js chrome-extension/scripts/content.js",
@@ -27,7 +28,8 @@
 		"bookmarklet/livonian-keyboard.js": [
 			"prettier --write",
 			"bash -c 'npm run bookmarklet-minify'",
-			"git add bookmarklet/livonian-keyboard.min.js"
+			"bash -c 'npm run bookmarklet-link'",
+			"git add bookmarklet/livonian-keyboard.min.js bookmarklet/BOOKMARKLET.md"
 		],
 		"**/*": "prettier --write --ignore-unknown"
 	}
