@@ -20,6 +20,8 @@ Probing the old variants with libxkbcommon 1.6 (ctypes, keymap compiled from the
 
 - `livonianapxtd` is broken: after the apostrophe latch only the Latvian letters come out (ē ŗ ū ī ō ā š ģ ķ ļ ž č ņ, plus ţ ȳ ḑ), q w p j x m stay plain, and the backtick (Level 5) latch does nothing. Its six-symbol keys have no explicit key type.
 - `livlinguapxtd` works: it sets `FOUR_LEVEL`, `EIGHT_LEVEL` and `EIGHT_LEVEL_ALPHABETIC` explicitly, and both latch rows match the README. But after the backtick latch, letters with no Livonian character type nothing, while the bookmarklet passes them through.
+- With explicit key types, redefining keys after `include "lv(basic)"` works; `replace key` isn't needed.
+- `modifier_map Mod3 { <TLDE> }` breaks the latches: with a modmap on TLDE, the catch-all `interpret Any+AnyOf(all)` gives its `grave` levels a SetMods action, and a modifier action doesn't break a pending latch, so `` ` `` `` ` `` `q` types `` `ǟ `` and `'` `` ` `` `q` types `` `ä ``. The `pc` symbols already map `<LVL5>` to Mod3, which is all `ISO_Level5_Latch` needs, so TLDE gets no modmap. (`level5(modifier_mapping)` doesn't exist in xkb-data 2.41.)
 
 ## Files
 
@@ -32,12 +34,12 @@ A marker comment on the first line (`// livonian-keyboard`) so the installer can
 - `default partial alphanumeric_keys modifier_keys xkb_symbols "basic"`, `name[Group1] = "Livonian"`:
   - `include "lv(basic)"`, so the Latvian QWERTY layout and its AltGr (Level 3) characters stay.
   - `<AC11>` (apostrophe): `ISO_Level3_Latch`, Shift gives `quotedbl`, level 3 gives `apostrophe`.
-  - `<TLDE>` (backtick): `ISO_Level5_Latch`, Shift gives `asciitilde`, level 3 gives `grave`, level 5 gives `grave`, plus `modifier_map Mod3 { <TLDE> }`.
+  - `<TLDE>` (backtick): `ISO_Level5_Latch`, Shift gives `asciitilde`, level 3 gives `grave`, level 5 gives `grave`. No `modifier_map` on TLDE (see findings).
   - `<SPCE>`: level 3 gives `apostrophe`, level 5 gives `grave`.
   - `<AC11>` level 5 gives `apostrophe`, so `` ` `` then `'` types `'`.
   - `<AC11>`, `<TLDE>` and `<SPCE>` use an explicit `EIGHT_LEVEL` type.
   - Letter keys use an explicit `EIGHT_LEVEL_ALPHABETIC` type, as the working `livlinguapxtd` does, so Caps Lock uppercases the Livonian characters too (Caps Lock + `'` `q` → `Ä`, like the bookmarklet, which gets `Q`). Levels 3/4 hold the apostrophe characters, levels 5/6 the backtick characters. A level with no Livonian character repeats the plain letter (lower/upper), so latch + unmapped letter types the letter.
-- `xkb_symbols "linguistic"`, `name[Group1] = "Livonian (linguistic)"`: the old `livlinguapxtd` section, with levels 5/6 of letters without a backtick character filled with the plain letter, and `<AC11>` level 5 giving `apostrophe`.
+- `xkb_symbols "linguistic"`, `name[Group1] = "Livonian (linguistic)"`: the old `livlinguapxtd` section, with levels 5/6 of letters without a backtick character filled with the plain letter, `<AC11>` level 5 giving `apostrophe`, and its `modifier_map Mod3 { <TLDE> }` removed.
 - Author header comment kept from the old file. No X11 licence block: the file no longer copies the system `lv` file, it includes it.
 
 ### `linux/rules/evdev.xml`
