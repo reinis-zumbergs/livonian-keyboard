@@ -175,6 +175,18 @@ class InstallTest(unittest.TestCase):
 		self.assertIn("without sudo", result.stderr)
 		self.assertFalse(self.target.exists())
 
+	def test_install_into_new_config_dir_asks_to_log_out_first(self):
+		# The compositor only searches ~/.config/xkb if it existed at login
+		result = self.run_script()
+		self.assertEqual(result.returncode, 0, result.stderr)
+		self.assertIn("Log out and back in before adding", result.stdout)
+
+	def test_install_into_existing_config_dir_needs_no_new_login(self):
+		self.write_target("symbols/custom", 'xkb_symbols "basic" {};\n')
+		result = self.run_script()
+		self.assertEqual(result.returncode, 0, result.stderr)
+		self.assertNotIn("Log out and back in before adding", result.stdout)
+
 
 if __name__ == "__main__":
 	unittest.main()

@@ -57,6 +57,12 @@ install_layout() {
 		exit 1
 	fi
 
+	# Compositors only search ~/.config/xkb if it existed when the session
+	# started, so a new directory needs a new login
+	local new_dir=0
+	if [[ ! -d "$TARGET" ]]; then
+		new_dir=1
+	fi
 	for file in "${FILES[@]}"; do
 		install -D -m 644 "$SOURCE/$file" "$TARGET/$file"
 	done
@@ -68,13 +74,16 @@ install_layout() {
 		echo "Warning: your xkeyboard-config (xkb-data) is older than 2.37, so the backtick dead key won't work. The apostrophe dead key does." >&2
 	fi
 
+	echo "Livonian keyboard layout installed in $TARGET."
+	if ((new_dir)); then
+		echo "Log out and back in before adding the layout: your desktop only looks in $TARGET if it existed when you logged in."
+	fi
 	cat <<EOF
-Livonian keyboard layout installed in $TARGET.
 KDE Plasma: System Settings > Keyboard > Layouts > Add, then pick "Livonian".
 GNOME: add ('xkb', 'liv') to your input sources, e.g.
   gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'liv')]"
   (list your current ones with: gsettings get org.gnome.desktop.input-sources sources)
-If the layout doesn't show up, log out and back in. Works in Wayland sessions only.
+Works in Wayland sessions only.
 EOF
 }
 

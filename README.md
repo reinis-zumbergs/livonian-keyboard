@@ -90,7 +90,7 @@ This copies `linux/symbols/liv` to `~/.config/xkb/symbols/liv` and `linux/rules/
 - KDE Plasma: System Settings > Keyboard > Layouts > Add, then pick "Livonian".
 - GNOME: Settings may not list it, so add it to your input sources with `gsettings`, keeping your current ones (`gsettings get org.gnome.desktop.input-sources sources` lists them), e.g. `gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'liv')]"`.
 
-If the layout doesn't show up, log out and back in. If you already have your own `~/.config/xkb/rules/evdev.xml`, the script leaves it alone and prints what to add to it.
+If `~/.config/xkb` didn't exist before, log out and back in before adding the layout: the desktop only looks there if the folder existed when you logged in. Otherwise it fails to load the layouts that include Livonian and keeps your previous ones. If you already have your own `~/.config/xkb/rules/evdev.xml`, the script leaves it alone and prints what to add to it.
 
 To uninstall, first remove Livonian from your keyboard layouts (KDE System Settings or GNOME input sources), then run `linux/install.sh --uninstall`. Otherwise your desktop can't load your layouts at the next login and falls back to a default one, so the script refuses while Livonian is still in your layouts. It removes only the files it installed.
 
