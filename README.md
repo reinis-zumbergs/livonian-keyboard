@@ -75,9 +75,30 @@ The Chrome extension enables the Livonian keyboard layout on all websites. It is
 
 To package the extension into `livonian-keyboard-chrome-extension.zip` for the Chrome Web Store, run `npm run chrome-extension-all`.
 
+## Linux
+
+The Linux layout is an XKB keyboard layout called "Livonian" (`liv`). It installs for your user only, without root and without changing the system's keyboard files. It works in Wayland sessions (KDE Plasma, GNOME and other desktops whose compositor uses libxkbcommon), in both Wayland and X11 apps. X11 sessions aren't supported.
+
+To install it, run:
+
+    linux/install.sh
+
+This copies `linux/symbols/liv` to `~/.config/xkb/symbols/liv` and `linux/rules/evdev.xml` to `~/.config/xkb/rules/evdev.xml` (or under `$XDG_CONFIG_HOME` if it's set). You can also copy the two files there by hand. Then add the layout:
+
+- KDE Plasma: System Settings > Keyboard > Layouts > Add, then pick "Livonian".
+- GNOME: Settings may not list it, so add it to your input sources with `gsettings`, keeping your current ones (`gsettings get org.gnome.desktop.input-sources sources` lists them), e.g. `gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'liv')]"`.
+
+If the layout doesn't show up, log out and back in. If you already have your own `~/.config/xkb/rules/evdev.xml`, the script leaves it alone and prints what to add to it.
+
+To uninstall, run `linux/install.sh --uninstall`. It removes only the files it installed.
+
+The layout is based on the Latvian (QWERTY) layout, so AltGr types the Latvian letters as usual. Apostrophe and backtick work as in the tables above. Unlike the bookmarklet, an apostrophe before a digit or punctuation key types that key's AltGr symbol (e.g. `'1` types `¹`), because AltGr and the apostrophe share the same key level.
+
+The "Livonian (linguistic)" variant has no Latvian AltGr letters. Instead, apostrophe before the number row and punctuation keys types typographic symbols (superscripts, fractions, guillemets, dashes), and Shift+Space types a no-break space.
+
 ## Development
 
-The keyboard logic lives in `bookmarklet/livonian-keyboard.js`. The minified version and the link on the bookmarklet page are generated on commit. Run the tests with `npm test`, and test manually with `bookmarklet/test-inputs.html`.
+The keyboard logic lives in `bookmarklet/livonian-keyboard.js`. The minified version and the link on the bookmarklet page are generated on commit. Run the tests with `npm test`, and test manually with `bookmarklet/test-inputs.html`. The Linux layout lives in `linux/symbols/liv`. `npm run linux-test` checks it against the bookmarklet with the system libxkbcommon, and tests the install script.
 
 ## TODO
 
