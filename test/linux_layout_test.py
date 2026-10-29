@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Tests the XKB layout in linux/ with the system libxkbcommon, against the
-# bookmarklet's deadKeyMap. Run: python3 -I test/linux_layout_test.py
+# bookmarklet's deadKeyMap, and its registry with the system libxkbregistry.
+# Run: python3 -I test/linux_layout_test.py
 
 import ctypes
 import functools
@@ -11,7 +12,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 XKB_DIR = REPO / "linux"
 SYSTEM_XKB_DIR = "/usr/share/X11/xkb"
-VARIANTS = [""]
+VARIANTS = ["", "linguistic"]
 
 LETTER_KEYS = {
 	letter: f"{row}{i + 1:02d}"
@@ -49,6 +50,27 @@ xkb.xkb_state_update_mask.argtypes = [ctypes.c_void_p] + [ctypes.c_uint32] * 6
 xkb.xkb_state_update_mask.restype = ctypes.c_int
 xkb.xkb_state_key_get_utf8.argtypes = [ctypes.c_void_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_size_t]
 xkb.xkb_state_key_get_utf8.restype = ctypes.c_int
+
+
+rxkb = ctypes.CDLL("libxkbregistry.so.0")
+RXKB_CONTEXT_NO_DEFAULT_INCLUDES = 1
+
+rxkb.rxkb_context_new.argtypes = [ctypes.c_int]
+rxkb.rxkb_context_new.restype = ctypes.c_void_p
+rxkb.rxkb_context_unref.argtypes = [ctypes.c_void_p]
+rxkb.rxkb_context_unref.restype = ctypes.c_void_p
+rxkb.rxkb_context_include_path_append.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+rxkb.rxkb_context_include_path_append.restype = ctypes.c_bool
+rxkb.rxkb_context_parse.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
+rxkb.rxkb_context_parse.restype = ctypes.c_bool
+for name in ("rxkb_layout_first", "rxkb_layout_next", "rxkb_layout_get_iso639_first", "rxkb_iso639_code_next"):
+	getattr(rxkb, name).argtypes = [ctypes.c_void_p]
+	getattr(rxkb, name).restype = ctypes.c_void_p
+for name in ("name", "variant", "brief", "description"):
+	getattr(rxkb, f"rxkb_layout_get_{name}").argtypes = [ctypes.c_void_p]
+	getattr(rxkb, f"rxkb_layout_get_{name}").restype = ctypes.c_char_p
+rxkb.rxkb_iso639_code_get_code.argtypes = [ctypes.c_void_p]
+rxkb.rxkb_iso639_code_get_code.restype = ctypes.c_char_p
 
 
 @functools.cache
@@ -106,6 +128,33 @@ def dead_key_map():
 		block = re.search(r'"' + re.escape(dead) + r'":\s*\{(.*?)\}', source, re.S)
 		result[dead] = dict(re.findall(r'(\w):\s*"(.)"', block.group(1))) if block else {}
 	return result
+
+
+# Lists the liv entries of the registry the way KDE's keyboard settings read
+# it, keyed by variant ("" for the layout itself)
+def liv_registry():
+	context = rxkb.rxkb_context_new(RXKB_CONTEXT_NO_DEFAULT_INCLUDES)
+	for path in (XKB_DIR, SYSTEM_XKB_DIR):
+		rxkb.rxkb_context_include_path_append(context, str(path).encode())
+	assert rxkb.rxkb_context_parse(context, b"evdev"), "registry did not parse"
+	entries = {}
+	layout = rxkb.rxkb_layout_first(context)
+	while layout:
+		if rxkb.rxkb_layout_get_name(layout) == b"liv":
+			languages = []
+			code = rxkb.rxkb_layout_get_iso639_first(layout)
+			while code:
+				languages.append(rxkb.rxkb_iso639_code_get_code(code).decode())
+				code = rxkb.rxkb_iso639_code_next(code)
+			brief = rxkb.rxkb_layout_get_brief(layout)
+			entries[(rxkb.rxkb_layout_get_variant(layout) or b"").decode()] = {
+				"brief": brief.decode() if brief else None,
+				"description": rxkb.rxkb_layout_get_description(layout).decode(),
+				"languages": languages,
+			}
+		layout = rxkb.rxkb_layout_next(layout)
+	rxkb.rxkb_context_unref(context)
+	return entries
 
 
 class LayoutTest(unittest.TestCase):
@@ -177,6 +226,16 @@ class LayoutTest(unittest.TestCase):
 					self.assertEqual(type_keys(km, "AD01", layout_index=1), "q")
 					self.assertEqual(type_keys(km, "AC11", "AD01", layout_index=1), "ä")
 					self.assertEqual(type_keys(km, "TLDE", "AB02", layout_index=1), "ȫ")
+
+	def test_registry_lists_liv(self):
+		registry = liv_registry()
+		self.assertEqual(registry[""]["brief"], "liv")
+		self.assertEqual(registry[""]["description"], "Livonian")
+		self.assertEqual(registry[""]["languages"], ["liv"])
+		self.assertEqual(registry["linguistic"]["description"], "Livonian (linguistic)")
+
+	def test_registry_matches_tested_variants(self):
+		self.assertEqual(sorted(liv_registry()), sorted(VARIANTS))
 
 
 if __name__ == "__main__":
