@@ -8,9 +8,9 @@
 set -euo pipefail
 
 SOURCE="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
-TARGET="${XDG_CONFIG_HOME:-$HOME/.config}/xkb"
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
+TARGET="$CONFIG/xkb"
 FILES=(symbols/liv rules/evdev.xml)
-# Our files contain this marker; files without it belong to someone else
 MARKER="livonian-keyboard"
 
 usage() {
@@ -18,13 +18,33 @@ usage() {
 	exit 2
 }
 
+# Our files carry the marker. A registry file with more layouts than ours has
+# the user's own additions, so it isn't ours to replace or remove.
+is_ours() {
+	grep -qF "$MARKER" "$1" && (($(grep -c '<layout>' "$1") <= 1))
+}
+
+# Prints where Livonian is still among the user's keyboard layouts
+configured_in() {
+	local sources
+	if [[ -f "$CONFIG/kxkbrc" ]] && grep -Eq '^LayoutList=(.*,)?liv(,|$)' "$CONFIG/kxkbrc"; then
+		echo "  KDE Plasma: System Settings > Keyboard > Layouts"
+	fi
+	if command -v gsettings >/dev/null; then
+		sources="$(gsettings get org.gnome.desktop.input-sources sources 2>/dev/null || true)"
+		if grep -Eq "'liv(\+[^']*)?'" <<<"$sources"; then
+			echo "  GNOME: Settings > Keyboard > Input Sources"
+		fi
+	fi
+}
+
 install_layout() {
 	local file conflict=0
 	# Check every target before writing anything
 	for file in "${FILES[@]}"; do
-		if [[ -e "$TARGET/$file" ]] && ! grep -qF "$MARKER" "$TARGET/$file"; then
+		if [[ -e "$TARGET/$file" ]] && ! is_ours "$TARGET/$file"; then
 			conflict=1
-			echo "$TARGET/$file exists and wasn't installed by this script, leaving it alone." >&2
+			echo "$TARGET/$file isn't the file this script installed, leaving it alone." >&2
 			if [[ "$file" == rules/evdev.xml ]]; then
 				echo "To install by hand, add this inside the <layoutList> of that file:" >&2
 				sed -n '/<layout>/,/<\/layout>/p' "$SOURCE/$file" >&2
@@ -41,6 +61,13 @@ install_layout() {
 		install -D -m 644 "$SOURCE/$file" "$TARGET/$file"
 	done
 
+	# The backtick latch needs the <LVL5> mapping that the system pc symbols
+	# got in xkeyboard-config 2.37. libxkbcommon reads them from here.
+	local pc="${XKB_CONFIG_ROOT:-/usr/share/X11/xkb}/symbols/pc"
+	if [[ -f "$pc" ]] && ! grep -qF '<LVL5>' "$pc"; then
+		echo "Warning: your xkeyboard-config (xkb-data) is older than 2.37, so the backtick dead key won't work. The apostrophe dead key does." >&2
+	fi
+
 	cat <<EOF
 Livonian keyboard layout installed in $TARGET.
 KDE Plasma: System Settings > Keyboard > Layouts > Add, then pick "Livonian".
@@ -52,14 +79,23 @@ EOF
 }
 
 uninstall_layout() {
-	local file dir
+	local file dir places
+	# Without its files the desktop can't build a keymap that lists Livonian,
+	# and falls back to a default layout, dropping all of the user's layouts
+	places="$(configured_in)"
+	if [[ -n "$places" ]]; then
+		echo "Remove Livonian from your keyboard layouts first, then run this again:" >&2
+		echo "$places" >&2
+		exit 1
+	fi
+
 	for file in "${FILES[@]}"; do
 		if [[ ! -e "$TARGET/$file" ]]; then
 			continue
-		elif grep -qF "$MARKER" "$TARGET/$file"; then
+		elif is_ours "$TARGET/$file"; then
 			rm "$TARGET/$file"
 		else
-			echo "$TARGET/$file wasn't installed by this script, leaving it alone." >&2
+			echo "$TARGET/$file isn't the file this script installed, leaving it alone." >&2
 		fi
 	done
 	# Remove the directories only if nothing else is in them
@@ -73,6 +109,11 @@ uninstall_layout() {
 
 if (($# > 1)); then
 	usage
+fi
+
+if [[ "$(id -u)" == 0 ]]; then
+	echo "Run this as your own user, without sudo: it installs the layout into your home directory." >&2
+	exit 1
 fi
 
 case "${1-}" in

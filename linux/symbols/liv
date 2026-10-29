@@ -16,9 +16,9 @@ xkb_symbols "basic" {
 
 	name[Group1] = "Livonian";
 
-	// No modifier_map on the latch keys: pc already maps LevelFive, and a
-	// modifier map would turn their other levels into modifier actions,
-	// which don't clear a pending latch.
+	// No modifier_map on the latch keys: pc maps LevelFive (since
+	// xkeyboard-config 2.37), and a modifier map would turn their other
+	// levels into modifier actions, which don't clear a pending latch.
 	key.type[Group1] = "EIGHT_LEVEL";
 	key <AC11> {[ISO_Level3_Latch, quotedbl, apostrophe, quotedbl, apostrophe, quotedbl]};
 	key <TLDE> {[ISO_Level5_Latch, asciitilde, grave, acute, grave, asciitilde]};

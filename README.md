@@ -79,7 +79,9 @@ To package the extension into `livonian-keyboard-chrome-extension.zip` for the C
 
 The Linux layout is an XKB keyboard layout called "Livonian" (`liv`). It installs for your user only, without root and without changing the system's keyboard files. It works in Wayland sessions (KDE Plasma, GNOME and other desktops whose compositor uses libxkbcommon), in both Wayland and X11 apps. X11 sessions aren't supported.
 
-To install it, run:
+The backtick dead key needs xkeyboard-config (the `xkb-data` package) 2.37 or newer, e.g. Ubuntu 24.04 or Debian 13. On older systems, such as Ubuntu 22.04 or Debian 12, only the apostrophe dead key works, and the install script warns about it.
+
+To install it, run this as your own user, without `sudo`:
 
     linux/install.sh
 
@@ -90,7 +92,7 @@ This copies `linux/symbols/liv` to `~/.config/xkb/symbols/liv` and `linux/rules/
 
 If the layout doesn't show up, log out and back in. If you already have your own `~/.config/xkb/rules/evdev.xml`, the script leaves it alone and prints what to add to it.
 
-To uninstall, run `linux/install.sh --uninstall`. It removes only the files it installed.
+To uninstall, first remove Livonian from your keyboard layouts (KDE System Settings or GNOME input sources), then run `linux/install.sh --uninstall`. Otherwise your desktop can't load your layouts at the next login and falls back to a default one, so the script refuses while Livonian is still in your layouts. It removes only the files it installed.
 
 The layout is based on the Latvian (QWERTY) layout, so AltGr types the Latvian letters as usual. Apostrophe and backtick work as in the tables above. Unlike the bookmarklet, an apostrophe before a digit or punctuation key types that key's AltGr symbol (e.g. `'1` types `¹`), because AltGr and the apostrophe share the same key level.
 

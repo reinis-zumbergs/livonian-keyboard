@@ -22,12 +22,32 @@ class InstallTest(unittest.TestCase):
 		self.home.mkdir()
 		self.config.mkdir()
 		self.target = self.config / "xkb"
+		# Stand-ins for system commands, so the developer's desktop settings
+		# can't affect the result
+		self.bin = Path(tmp.name) / "bin"
+		self.bin.mkdir()
+		self.fake_command("gsettings", "echo \"@a(ss) []\"")
 
-	def run_script(self, *args, xdg=True):
-		env = {"PATH": os.environ["PATH"], "HOME": str(self.home)}
+	def run_script(self, *args, xdg=True, **extra_env):
+		env = {"PATH": f"{self.bin}:{os.environ['PATH']}", "HOME": str(self.home), **extra_env}
 		if xdg:
 			env["XDG_CONFIG_HOME"] = str(self.config)
 		return subprocess.run(["bash", str(SCRIPT), *args], env=env, capture_output=True, text=True)
+
+	def fake_command(self, name, body):
+		path = self.bin / name
+		path.write_text(f"#!/bin/sh\n{body}\n")
+		path.chmod(0o755)
+
+	# Adds a layout of the user's own to the installed registry file
+	def add_own_layout(self):
+		path = self.target / "rules/evdev.xml"
+		text = path.read_text().replace(
+			"\t</layoutList>",
+			"\t\t<layout><configItem><name>mine</name><description>Mine</description></configItem></layout>\n\t</layoutList>",
+		)
+		path.write_text(text)
+		return text
 
 	def write_target(self, name, text):
 		path = self.target / name
@@ -45,6 +65,7 @@ class InstallTest(unittest.TestCase):
 		self.assert_installed(self.target)
 		self.assertIn("Livonian", result.stdout)
 		self.assertIn("gsettings", result.stdout)
+		self.assertNotIn("2.37", result.stderr)
 
 	def test_install_replaces_own_files(self):
 		self.write_target("symbols/liv", "// livonian-keyboard\nold\n")
@@ -100,6 +121,59 @@ class InstallTest(unittest.TestCase):
 		result = self.run_script("--frobnicate")
 		self.assertEqual(result.returncode, 2)
 		self.assertIn("Usage", result.stderr)
+
+	def test_install_warns_on_old_xkeyboard_config(self):
+		# Before 2.37 the system pc symbols don't map <LVL5>, which the
+		# backtick latch needs
+		root = Path(self.home) / "xkb-root"
+		(root / "symbols").mkdir(parents=True)
+		(root / "symbols/pc").write_text('xkb_symbols "pc105" {\n\tkey <LVL3> {[ISO_Level3_Shift]};\n};\n')
+		result = self.run_script(XKB_CONFIG_ROOT=str(root))
+		self.assertEqual(result.returncode, 0, result.stderr)
+		self.assert_installed(self.target)
+		self.assertIn("2.37", result.stderr)
+
+	def test_install_keeps_edited_evdev_xml(self):
+		self.run_script()
+		edited = self.add_own_layout()
+		self.assertEqual(self.run_script().returncode, 1)
+		self.assertEqual((self.target / "rules/evdev.xml").read_text(), edited)
+
+	def test_uninstall_keeps_edited_evdev_xml(self):
+		self.run_script()
+		edited = self.add_own_layout()
+		self.assertEqual(self.run_script("--uninstall").returncode, 0)
+		self.assertEqual((self.target / "rules/evdev.xml").read_text(), edited)
+
+	def test_uninstall_refuses_while_in_kde_layouts(self):
+		self.run_script()
+		(self.config / "kxkbrc").write_text("[Layout]\nLayoutList=lv,liv\nUse=true\n")
+		result = self.run_script("--uninstall")
+		self.assertEqual(result.returncode, 1)
+		self.assertIn("Remove Livonian", result.stderr)
+		self.assert_installed(self.target)
+
+	def test_uninstall_refuses_while_in_gnome_sources(self):
+		self.run_script()
+		self.fake_command("gsettings", "echo \"[('xkb', 'us'), ('xkb', 'liv+linguistic')]\"")
+		result = self.run_script("--uninstall")
+		self.assertEqual(result.returncode, 1)
+		self.assertIn("Remove Livonian", result.stderr)
+		self.assert_installed(self.target)
+
+	def test_uninstall_ignores_other_layouts_named_like_liv(self):
+		self.run_script()
+		(self.config / "kxkbrc").write_text("[Layout]\nLayoutList=lv,olive\n")
+		self.fake_command("gsettings", "echo \"[('xkb', 'lv'), ('xkb', 'liver')]\"")
+		self.assertEqual(self.run_script("--uninstall").returncode, 0)
+		self.assertFalse((self.target / "symbols/liv").exists())
+
+	def test_refuses_to_run_as_root(self):
+		self.fake_command("id", "echo 0")
+		result = self.run_script()
+		self.assertEqual(result.returncode, 1)
+		self.assertIn("without sudo", result.stderr)
+		self.assertFalse(self.target.exists())
 
 
 if __name__ == "__main__":
