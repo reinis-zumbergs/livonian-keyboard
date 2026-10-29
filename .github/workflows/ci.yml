@@ -16,6 +16,9 @@ jobs:
       - run: npm ci
       - run: npx prettier --check .
       - run: npm test
+      - name: Install XKB libraries for the Linux layout tests
+        run: sudo apt-get update && sudo apt-get install -y libxkbcommon0 xkb-data
+      - run: npm run linux-test
       # Fails when the minified script or the bookmarklet link wasn't
       # regenerated, e.g. after a commit with --no-verify
       - name: Check generated bookmarklet files are up to date
