@@ -58,7 +58,9 @@ install_layout() {
 	fi
 
 	# Compositors only search ~/.config/xkb if it existed when the session
-	# started, so a new directory needs a new login
+	# started, so a new directory needs a new session. A restart, because
+	# logging straight back in can reuse the old, half-closed user session
+	# and hang the desktop's start-up.
 	local new_dir=0
 	if [[ ! -d "$TARGET" ]]; then
 		new_dir=1
@@ -76,7 +78,7 @@ install_layout() {
 
 	echo "Livonian keyboard layout installed in $TARGET."
 	if ((new_dir)); then
-		echo "Log out and back in before adding the layout: your desktop only looks in $TARGET if it existed when you logged in."
+		echo "Restart your computer before adding the layout: your desktop only looks in $TARGET if it existed when your session started."
 	fi
 	cat <<EOF
 KDE Plasma: System Settings > Keyboard > Layouts > Add, then pick "Livonian".

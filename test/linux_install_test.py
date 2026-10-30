@@ -175,17 +175,20 @@ class InstallTest(unittest.TestCase):
 		self.assertIn("without sudo", result.stderr)
 		self.assertFalse(self.target.exists())
 
-	def test_install_into_new_config_dir_asks_to_log_out_first(self):
-		# The compositor only searches ~/.config/xkb if it existed at login
+	def test_install_into_new_config_dir_asks_to_restart_first(self):
+		# The compositor only searches ~/.config/xkb if it existed when the
+		# session started. Logging straight back in can hang the desktop's
+		# start-up, so the advice is a restart.
 		result = self.run_script()
 		self.assertEqual(result.returncode, 0, result.stderr)
-		self.assertIn("Log out and back in before adding", result.stdout)
+		self.assertIn("Restart your computer before adding", result.stdout)
+		self.assertNotIn("Log out", result.stdout)
 
-	def test_install_into_existing_config_dir_needs_no_new_login(self):
+	def test_install_into_existing_config_dir_needs_no_restart(self):
 		self.write_target("symbols/custom", 'xkb_symbols "basic" {};\n')
 		result = self.run_script()
 		self.assertEqual(result.returncode, 0, result.stderr)
-		self.assertNotIn("Log out and back in before adding", result.stdout)
+		self.assertNotIn("Restart your computer", result.stdout)
 
 
 if __name__ == "__main__":
