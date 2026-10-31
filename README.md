@@ -77,7 +77,9 @@ To package the extension into `livonian-keyboard-chrome-extension.zip` for the C
 
 ## Linux
 
-The Linux layout is an XKB keyboard layout called "Livonian" (`liv`). It installs for your user only, without root and without changing the system's keyboard files. It works in Wayland sessions (KDE Plasma, GNOME and other desktops whose compositor uses libxkbcommon), in both Wayland and X11 apps. X11 sessions aren't supported.
+The Linux layout is an XKB keyboard layout called "Livonian" (`liv`). It installs for your user only, without root and without changing the system's keyboard files. It works in Wayland sessions (KDE Plasma, GNOME and other desktops whose compositor uses libxkbcommon), in both Wayland and X11 apps. It's tested with KDE Plasma 6.6 and 6.8.
+
+X11 sessions aren't supported: adding Livonian to your layouts in an X11 session makes all your layouts stop working, and only the system's default one is left. To recover, log in to the Wayland session (in KDE: "Plasma (Wayland)"), where all your layouts work, or remove Livonian from your layouts. The install script warns when your desktop runs an X11 session.
 
 The backtick dead key needs xkeyboard-config (the `xkb-data` package) 2.37 or newer, e.g. Ubuntu 24.04 or Debian 13. On older systems, such as Ubuntu 22.04 or Debian 12, only the apostrophe dead key works, and the install script warns about it.
 
@@ -90,9 +92,11 @@ This copies `linux/symbols/liv` to `~/.config/xkb/symbols/liv` and `linux/rules/
 - KDE Plasma: System Settings > Keyboard > Layouts > Add, then pick "Livonian".
 - GNOME: Settings may not list it, so add it to your input sources with `gsettings`, keeping your current ones (`gsettings get org.gnome.desktop.input-sources sources` lists them), e.g. `gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'liv')]"`.
 
-If `~/.config/xkb` didn't exist before, restart your computer before adding the layout: the desktop only looks there if the folder existed when your session started. Restart rather than log out, because logging straight back in can hang the desktop's start-up. Without the restart, it fails to load the layouts that include Livonian and keeps your previous ones. If you already have your own `~/.config/xkb/rules/evdev.xml`, the script leaves it alone and prints what to add to it.
+If `~/.config/xkb` didn't exist before, restart your computer before adding the layout: the desktop only looks there if the folder existed when your session started. Restart rather than log out, because logging straight back in can hang the desktop's start-up. If you're in an X11 session, choose the Wayland session on the login screen: it starts the session type you used last. Without the restart, it fails to load the layouts that include Livonian and keeps your previous ones. If you already have your own `~/.config/xkb/rules/evdev.xml`, the script leaves it alone and prints what to add to it.
 
 To uninstall, first remove Livonian from your keyboard layouts (KDE System Settings or GNOME input sources), then run `linux/install.sh --uninstall`. Otherwise your desktop can't load your layouts at the next login and falls back to a default one, so the script refuses while Livonian is still in your layouts. It removes only the files it installed.
+
+If you used the older Livonian layout that replaced the system's keyboard files in `/usr/share/X11/xkb` (the Latvian variants "Livonian (apostrophe+tilde)" and "Livonian Linguistic ApXTd"), move to this one: the next `xkb-data` update overwrites those files, and the old variants disappear. In a Wayland session, install this layout, add "Livonian" (or "Livonian (linguistic)" in place of "Livonian Linguistic ApXTd"), and remove the old variants from your layouts. Then restore the system files with `sudo apt install --reinstall xkb-data` (on other distributions, reinstall `xkeyboard-config`). Remove the old variants first, or your desktop can't load your layouts. "Livonian (apostrophe+tilde)" never fully worked in Wayland sessions, so "Livonian" replaces it.
 
 The layout is based on the Latvian (QWERTY) layout, so AltGr types the Latvian letters as usual. Apostrophe and backtick work as in the tables above. Unlike the bookmarklet, an apostrophe before a digit or punctuation key types that key's AltGr symbol (e.g. `'1` types `¹`), because AltGr and the apostrophe share the same key level.
 

@@ -38,6 +38,23 @@ configured_in() {
 	fi
 }
 
+# Succeeds if the user's desktop runs an X11 session. Over SSH or on a text
+# console the current session is a tty one, so check the user's other sessions.
+in_x11_session() {
+	local session
+	case "${XDG_SESSION_TYPE-}" in
+	x11) return 0 ;;
+	wayland) return 1 ;;
+	esac
+	command -v loginctl >/dev/null || return 1
+	for session in $(loginctl show-user "$(id -u)" -p Sessions --value 2>/dev/null || true); do
+		if [[ "$(loginctl show-session "$session" -p Type --value 2>/dev/null || true)" == x11 ]]; then
+			return 0
+		fi
+	done
+	return 1
+}
+
 install_layout() {
 	local file conflict=0
 	# Check every target before writing anything
@@ -76,8 +93,18 @@ install_layout() {
 		echo "Warning: your xkeyboard-config (xkb-data) is older than 2.37, so the backtick dead key won't work. The apostrophe dead key does." >&2
 	fi
 
+	# X11 compiles the keymap with xkbcomp, which only reads the system files.
+	# It can't find liv and rejects the whole layout list, not just Livonian.
+	# Login screens start the session type used last, so say to pick Wayland.
+	local x11=0
+	if in_x11_session; then
+		x11=1
+	fi
+
 	echo "Livonian keyboard layout installed in $TARGET."
-	if ((new_dir)); then
+	if ((x11)); then
+		echo "Restart your computer and choose the Wayland session on the login screen (in KDE: \"Plasma (Wayland)\") before adding the layout."
+	elif ((new_dir)); then
 		echo "Restart your computer before adding the layout: your desktop only looks in $TARGET if it existed when your session started."
 	fi
 	cat <<EOF
@@ -85,8 +112,12 @@ KDE Plasma: System Settings > Keyboard > Layouts > Add, then pick "Livonian".
 GNOME: add ('xkb', 'liv') to your input sources, e.g.
   gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'liv')]"
   (list your current ones with: gsettings get org.gnome.desktop.input-sources sources)
-Works in Wayland sessions only.
+Works in Wayland sessions only: adding Livonian in an X11 session leaves you with only the system's default layout.
 EOF
+	if ((x11)); then
+		echo >&2
+		echo "Warning: your desktop runs an X11 session. Don't add Livonian to your keyboard layouts in it: X11 can't load the layout, so all your layouts stop working and only the system's default one is left." >&2
+	fi
 }
 
 uninstall_layout() {

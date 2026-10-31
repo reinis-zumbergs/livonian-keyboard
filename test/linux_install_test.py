@@ -27,6 +27,8 @@ class InstallTest(unittest.TestCase):
 		self.bin = Path(tmp.name) / "bin"
 		self.bin.mkdir()
 		self.fake_command("gsettings", "echo \"@a(ss) []\"")
+		# Like loginctl for a user with no sessions
+		self.fake_command("loginctl", "exit 1")
 
 	def run_script(self, *args, xdg=True, **extra_env):
 		env = {"PATH": f"{self.bin}:{os.environ['PATH']}", "HOME": str(self.home), **extra_env}
@@ -189,6 +191,47 @@ class InstallTest(unittest.TestCase):
 		result = self.run_script()
 		self.assertEqual(result.returncode, 0, result.stderr)
 		self.assertNotIn("Restart your computer", result.stdout)
+
+	# Gives the user a tty session (this SSH login) and a desktop session
+	def fake_sessions(self, desktop_type):
+		self.fake_command(
+			"loginctl",
+			'case "$1 $2" in\n'
+			'"show-user "*) echo "3 c1" ;;\n'
+			'"show-session 3") echo tty ;;\n'
+			f'"show-session c1") echo {desktop_type} ;;\n'
+			"esac",
+		)
+
+	def test_install_in_x11_session_warns_and_installs(self):
+		# X11 compiles keymaps from the system files only, so adding liv
+		# there breaks every layout, not just Livonian
+		result = self.run_script(XDG_SESSION_TYPE="x11")
+		self.assertEqual(result.returncode, 0, result.stderr)
+		self.assert_installed(self.target)
+		self.assertIn("X11 session", result.stderr)
+		self.assertIn("choose the Wayland session", result.stdout)
+		self.assertNotIn("Restart your computer before adding", result.stdout)
+
+	def test_install_in_wayland_session_doesnt_warn(self):
+		self.fake_sessions("x11")
+		result = self.run_script(XDG_SESSION_TYPE="wayland")
+		self.assertEqual(result.returncode, 0, result.stderr)
+		self.assertNotIn("X11 session", result.stderr)
+		self.assertNotIn("choose the Wayland session", result.stdout)
+
+	def test_install_over_ssh_warns_about_users_x11_session(self):
+		self.fake_sessions("x11")
+		result = self.run_script(XDG_SESSION_TYPE="tty")
+		self.assertEqual(result.returncode, 0, result.stderr)
+		self.assertIn("X11 session", result.stderr)
+		self.assertIn("choose the Wayland session", result.stdout)
+
+	def test_install_over_ssh_with_wayland_session_doesnt_warn(self):
+		self.fake_sessions("wayland")
+		result = self.run_script(XDG_SESSION_TYPE="tty")
+		self.assertEqual(result.returncode, 0, result.stderr)
+		self.assertNotIn("X11 session", result.stderr)
 
 
 if __name__ == "__main__":
