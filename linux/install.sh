@@ -109,9 +109,10 @@ install_layout() {
 	fi
 	cat <<EOF
 KDE Plasma: System Settings > Keyboard > Layouts > Add, then pick "Livonian".
-GNOME: add ('xkb', 'liv') to your input sources, e.g.
-  gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'us'), ('xkb', 'liv')]"
-  (list your current ones with: gsettings get org.gnome.desktop.input-sources sources)
+GNOME: make ('xkb', 'liv') your input source:
+  gsettings set org.gnome.desktop.input-sources sources "[('xkb', 'liv')]"
+  (to keep layouts for other languages, list your current ones first with: gsettings get org.gnome.desktop.input-sources sources)
+Livonian types the Latvian letters as Latvian does, so you can remove Latvian from your layouts once Livonian is added.
 Works in Wayland sessions only: adding Livonian in an X11 session leaves you with only the system's default layout.
 EOF
 	if ((x11)); then
@@ -121,7 +122,7 @@ EOF
 }
 
 uninstall_layout() {
-	local file dir places
+	local file dir places removed=0
 	# Without its files the desktop can't build a keymap that lists Livonian,
 	# and falls back to a default layout, dropping all of the user's layouts
 	places="$(configured_in)"
@@ -136,6 +137,7 @@ uninstall_layout() {
 			continue
 		elif is_ours "$TARGET/$file"; then
 			rm "$TARGET/$file"
+			removed=1
 		else
 			echo "$TARGET/$file isn't the file this script installed, leaving it alone." >&2
 		fi
@@ -146,7 +148,11 @@ uninstall_layout() {
 			rmdir --ignore-fail-on-non-empty "$dir"
 		fi
 	done
-	echo "Livonian keyboard layout removed from $TARGET."
+	if ((removed)); then
+		echo "Livonian keyboard layout removed from $TARGET."
+	else
+		echo "Livonian keyboard layout isn't installed in $TARGET, nothing to remove."
+	fi
 }
 
 if (($# > 1)); then

@@ -66,7 +66,9 @@ class InstallTest(unittest.TestCase):
 		self.assertEqual(result.returncode, 0, result.stderr)
 		self.assert_installed(self.target)
 		self.assertIn("Livonian", result.stdout)
-		self.assertIn("gsettings", result.stdout)
+		# Livonian is meant to be the only layout
+		self.assertIn("gsettings set org.gnome.desktop.input-sources sources \"[('xkb', 'liv')]\"", result.stdout)
+		self.assertIn("remove Latvian", result.stdout)
 		self.assertNotIn("2.37", result.stderr)
 
 	def test_install_replaces_own_files(self):
@@ -97,7 +99,9 @@ class InstallTest(unittest.TestCase):
 	def test_uninstall_removes_own_files_only(self):
 		self.run_script()
 		custom = self.write_target("symbols/custom", 'xkb_symbols "basic" {};\n')
-		self.assertEqual(self.run_script("--uninstall").returncode, 0)
+		result = self.run_script("--uninstall")
+		self.assertEqual(result.returncode, 0)
+		self.assertIn("removed from", result.stdout)
 		for name in FILES:
 			self.assertFalse((self.target / name).exists(), name)
 		self.assertFalse((self.target / "rules").exists())
@@ -111,7 +115,10 @@ class InstallTest(unittest.TestCase):
 	def test_uninstall_twice_is_noop(self):
 		self.run_script()
 		self.run_script("--uninstall")
-		self.assertEqual(self.run_script("--uninstall").returncode, 0)
+		result = self.run_script("--uninstall")
+		self.assertEqual(result.returncode, 0)
+		self.assertIn("nothing to remove", result.stdout)
+		self.assertNotIn("removed from", result.stdout)
 		self.assertFalse(self.target.exists())
 
 	def test_default_target_is_home_config(self):
