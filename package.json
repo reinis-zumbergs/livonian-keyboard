@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "jest",
+		"linux-test": "python3 -I test/linux_layout_test.py && python3 -I test/linux_install_test.py",
 		"bookmarklet-minify": "terser bookmarklet/livonian-keyboard.js -c -m > bookmarklet/livonian-keyboard.min.js",
 		"bookmarklet-link": "node scripts/bookmarklet-link.js",
 		"prettier": "prettier --write .",

@@ -1,0 +1,136 @@
+// livonian-keyboard
+// Livonian keyboard layout, https://github.com/reinis-zumbergs/livonian-keyboard
+// linux/install.sh installs this file into ~/.config/xkb/symbols/.
+//
+// Apostrophe and backtick latch the third and fifth level, so they work as
+// dead keys: ' q types ä, ` q types ǟ, and ' or ` before a letter without a
+// Livonian character types the plain letter.
+//
+// Author: Reinis Zumbergs
+
+// Latvian (QWERTY) with the apostrophe and backtick dead keys.
+default partial alphanumeric_keys modifier_keys
+xkb_symbols "basic" {
+
+	include "lv(basic)"
+
+	name[Group1] = "Livonian";
+
+	// No modifier_map on the latch keys: pc maps LevelFive (since
+	// xkeyboard-config 2.37), and a modifier map would turn their other
+	// levels into modifier actions, which don't clear a pending latch.
+	key.type[Group1] = "EIGHT_LEVEL";
+	key <AC11> {[ISO_Level3_Latch, quotedbl, apostrophe, quotedbl, apostrophe, quotedbl]};
+	key <TLDE> {[ISO_Level5_Latch, asciitilde, grave, acute, grave, asciitilde]};
+	key <SPCE> {[space, space, apostrophe, quotedbl, grave, asciitilde]};
+
+	// Levels 3/4: after apostrophe, levels 5/6: after backtick
+	key.type[Group1] = "EIGHT_LEVEL_ALPHABETIC";
+
+	// top row
+	key <AD01> {[q, Q, adiaeresis, Adiaeresis, U01DF, U01DE]}; // ä Ä ǟ Ǟ
+	key <AD02> {[w, W, udiaeresis, Udiaeresis, U01D6, U01D5]}; // ü Ü ǖ Ǖ
+	key <AD03> {[e, E, emacron, Emacron, e, E]};
+	key <AD04> {[r, R, rcedilla, Rcedilla, r, R]};
+	key <AD05> {[t, T, tcedilla, Tcedilla, t, T]};
+	key <AD06> {[y, Y, U0233, U0232, y, Y]}; // ȳ Ȳ
+	key <AD07> {[u, U, umacron, Umacron, u, U]};
+	key <AD08> {[i, I, imacron, Imacron, i, I]};
+	key <AD09> {[o, O, omacron, Omacron, o, O]};
+	key <AD10> {[p, P, U01EB, U01EA, U01ED, U01EC]}; // ǫ Ǫ ǭ Ǭ
+	// middle row
+	key <AC01> {[a, A, amacron, Amacron, a, A]};
+	key <AC02> {[s, S, scaron, Scaron, s, S]};
+	key <AC03> {[d, D, U1E11, U1E10, d, D]}; // ḑ Ḑ
+	key <AC04> {[f, F, f, F, f, F]};
+	key <AC05> {[g, G, gcedilla, Gcedilla, g, G]};
+	key <AC06> {[h, H, h, H, h, H]};
+	key <AC07> {[j, J, U022F, U022E, U0231, U0230]}; // ȯ Ȯ ȱ Ȱ
+	key <AC08> {[k, K, kcedilla, Kcedilla, k, K]};
+	key <AC09> {[l, L, lcedilla, Lcedilla, l, L]};
+	// bottom row
+	key <AB01> {[z, Z, zcaron, Zcaron, z, Z]};
+	key <AB02> {[x, X, odiaeresis, Odiaeresis, U022B, U022A]}; // ö Ö ȫ Ȫ
+	key <AB03> {[c, C, ccaron, Ccaron, c, C]};
+	key <AB04> {[v, V, v, V, v, V]};
+	key <AB05> {[b, B, b, B, b, B]};
+	key <AB06> {[n, N, ncedilla, Ncedilla, n, N]};
+	key <AB07> {[m, M, otilde, Otilde, U022D, U022C]}; // õ Õ ȭ Ȭ
+};
+
+// Linguistic: without the Latvian AltGr letters, with typographic symbols
+// (superscripts, fractions, guillemets, dashes) on the third and fourth level
+// of the number row and punctuation keys, and Shift+Space for a no-break space.
+partial alphanumeric_keys modifier_keys keypad_keys
+xkb_symbols "linguistic" {
+
+	name[Group1] = "Livonian (linguistic)";
+
+	key.type[Group1] = "FOUR_LEVEL";
+
+	// number row
+	key <AE01> {[1, exclam, onesuperior, exclamdown]};
+	key <AE02> {[2, at, twosuperior, oneeighth]};
+	key <AE03> {[3, numbersign, threesuperior, sterling]};
+	key <AE04> {[4, dollar, EuroSign, cent]};
+	key <AE05> {[5, percent, onehalf, threeeighths]};
+	key <AE06> {[6, asciicircum, threequarters, fiveeighths]};
+	key <AE07> {[7, ampersand, braceleft, seveneighths]};
+	key <AE08> {[8, asterisk, bracketleft, trademark]};
+	key <AE09> {[9, parenleft, bracketright, plusminus]};
+	key <AE10> {[0, parenright, braceright, degree]};
+	key <AE11> {[minus, underscore, backslash, questiondown]};
+	key <AE12> {[equal, plus, endash, emdash]};
+
+	// top row
+	key <AD11> {[bracketleft, braceleft, guillemotleft, leftdoublequotemark]};
+	key <AD12> {[bracketright, braceright, guillemotright, rightdoublequotemark]};
+
+	// middle row
+	key <AC10> {[semicolon, colon, semicolon, colon]};
+
+	// bottom row
+	key <AB08> {[comma, less, horizconnector, multiply]};
+	key <AB09> {[period, greater, periodcentered, division]};
+	key <AB10> {[slash, question, slash, abovedot]};
+	key <BKSL> {[backslash, bar, grave, breve]};
+
+	// No modifier_map on the latch keys, see "basic"
+	key.type[Group1] = "EIGHT_LEVEL";
+	key <AC11> {[ISO_Level3_Latch, quotedbl, apostrophe, quotedbl, apostrophe, quotedbl]};
+	key <TLDE> {[ISO_Level5_Latch, asciitilde, grave, acute, grave, asciitilde]};
+	key <SPCE> {[space, nobreakspace, apostrophe, quotedbl, grave, asciitilde]};
+
+	// Levels 3/4: after apostrophe, levels 5/6: after backtick
+	key.type[Group1] = "EIGHT_LEVEL_ALPHABETIC";
+
+	// top row
+	key <AD01> {[q, Q, adiaeresis, Adiaeresis, U01DF, U01DE]}; // ä Ä ǟ Ǟ
+	key <AD02> {[w, W, udiaeresis, Udiaeresis, U01D6, U01D5]}; // ü Ü ǖ Ǖ
+	key <AD03> {[e, E, emacron, Emacron, e, E]};
+	key <AD04> {[r, R, rcedilla, Rcedilla, r, R]};
+	key <AD05> {[t, T, tcedilla, Tcedilla, t, T]};
+	key <AD06> {[y, Y, U0233, U0232, y, Y]}; // ȳ Ȳ
+	key <AD07> {[u, U, umacron, Umacron, u, U]};
+	key <AD08> {[i, I, imacron, Imacron, i, I]};
+	key <AD09> {[o, O, omacron, Omacron, o, O]};
+	key <AD10> {[p, P, U01EB, U01EA, U01ED, U01EC]}; // ǫ Ǫ ǭ Ǭ
+	// middle row
+	key <AC01> {[a, A, amacron, Amacron, a, A]};
+	key <AC02> {[s, S, scaron, Scaron, s, S]};
+	key <AC03> {[d, D, U1E11, U1E10, d, D]}; // ḑ Ḑ
+	key <AC04> {[f, F, f, F, f, F]};
+	key <AC05> {[g, G, gcedilla, Gcedilla, g, G]};
+	key <AC06> {[h, H, h, H, h, H]};
+	key <AC07> {[j, J, U022F, U022E, U0231, U0230]}; // ȯ Ȯ ȱ Ȱ
+	key <AC08> {[k, K, kcedilla, Kcedilla, k, K]};
+	key <AC09> {[l, L, lcedilla, Lcedilla, l, L]};
+	// bottom row
+	key <AB01> {[z, Z, zcaron, Zcaron, z, Z]};
+	key <AB02> {[x, X, odiaeresis, Odiaeresis, U022B, U022A]}; // ö Ö ȫ Ȫ
+	key <AB03> {[c, C, ccaron, Ccaron, c, C]};
+	key <AB04> {[v, V, v, V, v, V]};
+	key <AB05> {[b, B, b, B, b, B]};
+	key <AB06> {[n, N, ncedilla, Ncedilla, n, N]};
+	key <AB07> {[m, M, otilde, Otilde, U022D, U022C]}; // õ Õ ȭ Ȭ
+};
